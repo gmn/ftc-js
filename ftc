@@ -1,0 +1,60 @@
+#!/usr/bin/env node
+
+var p = function(s) { console.log(s); };
+
+var usage = function() {
+    var exename = process.argv[1].lastIndexOf('/') != -1 ? process.argv[1].substring( process.argv[1].lastIndexOf('/') + 1 , process.argv[1].length ) : process.argv[1];
+    p( "usage: " + exename + " [-H|-B] <number|arithmetical statement>" );
+    p( "      -H  prints result in Hexadecimal" );
+    p( "      -B  prints result in Binary" );
+    p( "      -O  prints result in Octal" );
+    p( "\n    If an operator (eg. + - / * %) is the first argument, the result from the previous operation will be inserted as the first operand" );
+    process.exit(0);
+}
+
+if ( process.argv.length <= 2 ) {
+    usage();
+}
+
+var string = '';
+var base = 10;
+var HEX_LETTERS = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'];
+var BASE_PREFIX = {2:'0b',8:'0',16:'0x'};
+
+process.argv.forEach(function(val,i) {
+    if ( val === "-H" )
+        base = 16;
+    else if ( val === "-B" )
+        base = 2;
+    else if ( val === "-O" )
+        base = 8;
+    else
+        if ( i > 1 ) 
+            string += ' ' + val;
+});
+
+// evaluation takes place here
+var ans = '';
+eval( "ans = " + string.trim() );
+
+// takes base-10 float, converts to int, and renders in
+//  string of a different base. Supported bases: 2, 8, 16
+function base_convert( num, base )
+{    
+    num = Math.floor(num) + '';
+    var div = num;
+    num = [];
+
+    while ( div >= 1.0 ) {
+        var mod = Math.floor( div % base );
+        num.push( HEX_LETTERS[mod] );
+        div = div / base;
+    }
+
+    return num.reverse().join('');
+}
+
+if ( base != 10 )
+    p( BASE_PREFIX[base] + base_convert( ans, base ) );
+else
+    p( ans );
