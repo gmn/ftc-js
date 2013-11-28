@@ -16,6 +16,7 @@ ftc-js however supports:
 
 * Better number base conversion. Print answers in: **-H** Hexadecimal, **-O** Octal, **-B** Binary
 
+* Is no longer *Two Argument* ;)
 
 ## Contact
 
