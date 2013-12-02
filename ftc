@@ -3,6 +3,10 @@
 var p = function(s) { console.log(s); };
 var answer_file = "/tmp/1234-ftc-tmp";
 var fs = require('fs');
+var string = '';
+var base = 10;
+var HEX_LETTERS = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'];
+var BASE_PREFIX = {2:'0b',8:'0',16:'0x'};
 
 var usage = function() {
     var exename = process.argv[1].lastIndexOf('/') != -1 ? process.argv[1].substring( process.argv[1].lastIndexOf('/') + 1 , process.argv[1].length ) : process.argv[1];
@@ -13,15 +17,6 @@ var usage = function() {
     p( "\n  If an operator (eg. + - / * %) is the first argument\n  the result from the previous operation will be inserted as the first operand:\n  Eg. ftc 2 * 5; ftc + 2; will yield 12 (2*5+2)" );
     process.exit(0);
 }
-
-if ( process.argv.length <= 2 ) {
-    usage();
-}
-
-var string = '';
-var base = 10;
-var HEX_LETTERS = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'];
-var BASE_PREFIX = {2:'0b',8:'0',16:'0x'};
 
 function is_operator( tok ) {
     switch ( tok ) {
@@ -34,41 +29,6 @@ function is_operator( tok ) {
     }
     return false;
 }
-
-process.argv.forEach(function(value,index) {
-    if ( index >= 2 )   // first 2 arguments are: "node path" & "script name"
-        string += ' ' + value;
-});
-
-// tokenize the string 
-var tokens = string.trim().split(/\s+/g);
-
-// check for leading operator
-var leading_op = is_operator(tokens[0]);
-
-// check for conversion switch
-if ( !leading_op ) {
-    switch( tokens[0] ) {
-    case "-H": base = 16; break;
-    case "-O": base =  8; break;
-    case "-B": base =  2; break;
-    }
-}
-
-// reconstitute string
-string = tokens.join(' ');
-
-// get saved answer if there is one
-if ( leading_op ) {
-    var op = read_ans();
-    if ( op ) {
-        string = op.trim() + ' ' + string;
-    }
-}
-
-// evaluation takes place here
-var ans = '';
-eval( "ans = " + string );
 
 // takes base-10 float, converts to int, and renders in
 //  string of a different base. Supported bases: 2, 8, 16
@@ -102,6 +62,52 @@ function read_ans()
     } catch(e) {
         return null;
     }
+}
+
+//
+// begin execution
+// 
+if ( process.argv.length <= 2 ) {
+    usage();
+}
+
+// collect arguments
+process.argv.forEach(function(value,index) {
+    if ( index >= 2 )   // first 2 arguments are: "node path" & "script name"
+        string += ' ' + value;
+});
+
+// tokenize the string 
+var tokens = string.trim().split(/\s+/g);
+
+// check for conversion switch
+switch( tokens[0] ) {
+case "-H": base = 16; break;
+case "-O": base =  8; break;
+case "-B": base =  2; break;
+}
+if ( base !== 10 ) {
+    tokens.shift();
+}
+
+// begins with operator: get saved answer if there is one, and attach to front
+if ( is_operator(tokens[0]) ) {
+    var op = read_ans();
+    if ( op ) {
+        tokens.unshift( op.trim() );
+    }
+}
+
+// reconstitute string
+string = tokens.join(' ');
+
+// evaluation takes place here
+var ans = '';
+try {
+    eval( "ans = " + string );
+} catch(e) {
+    p( 'operation: "'+string+'" doesn\'t make sense' );
+    process.exit(0);
 }
 
 if ( base != 10 )
