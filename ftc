@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 var p = function(s) { console.log(s); };
+var answer_file = "/tmp/1234-ftc-tmp";
+var fs = require('fs');
 
 var usage = function() {
     var exename = process.argv[1].lastIndexOf('/') != -1 ? process.argv[1].substring( process.argv[1].lastIndexOf('/') + 1 , process.argv[1].length ) : process.argv[1];
@@ -8,7 +10,7 @@ var usage = function() {
     p( "      -H  prints result in Hexadecimal" );
     p( "      -B  prints result in Binary" );
     p( "      -O  prints result in Octal" );
-    p( "\n    If an operator (eg. + - / * %) is the first argument, the result from the previous operation will be inserted as the first operand" );
+    p( "\n  If an operator (eg. + - / * %) is the first argument\n  the result from the previous operation will be inserted as the first operand:\n  Eg. ftc 2 * 5; ftc + 2; will yield 12 (2*5+2)" );
     process.exit(0);
 }
 
@@ -21,21 +23,52 @@ var base = 10;
 var HEX_LETTERS = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'];
 var BASE_PREFIX = {2:'0b',8:'0',16:'0x'};
 
-process.argv.forEach(function(val,i) {
-    if ( val === "-H" )
-        base = 16;
-    else if ( val === "-B" )
-        base = 2;
-    else if ( val === "-O" )
-        base = 8;
-    else
-        if ( i > 1 ) 
-            string += ' ' + val;
+function is_operator( tok ) {
+    switch ( tok ) {
+    case "-": 
+    case "+":
+    case "*":
+    case "/":
+    case "%":
+        return true;
+    }
+    return false;
+}
+
+process.argv.forEach(function(value,index) {
+    if ( index >= 2 )   // first 2 arguments are: "node path" & "script name"
+        string += ' ' + value;
 });
+
+// tokenize the string 
+var tokens = string.trim().split(/\s+/g);
+
+// check for leading operator
+var leading_op = is_operator(tokens[0]);
+
+// check for conversion switch
+if ( !leading_op ) {
+    switch( tokens[0] ) {
+    case "-H": base = 16; break;
+    case "-O": base =  8; break;
+    case "-B": base =  2; break;
+    }
+}
+
+// reconstitute string
+string = tokens.join(' ');
+
+// get saved answer if there is one
+if ( leading_op ) {
+    var op = read_ans();
+    if ( op ) {
+        string = op.trim() + ' ' + string;
+    }
+}
 
 // evaluation takes place here
 var ans = '';
-eval( "ans = " + string.trim() );
+eval( "ans = " + string );
 
 // takes base-10 float, converts to int, and renders in
 //  string of a different base. Supported bases: 2, 8, 16
@@ -54,7 +87,27 @@ function base_convert( num, base )
     return num.reverse().join('');
 }
 
+function write_ans( ans )
+{
+    try {
+        fs.writeFileSync( answer_file, ans, {encoding:"utf8",mode:438,flag:'w'} );
+    } catch(e) {
+    }
+}
+
+function read_ans()
+{
+    try {
+        return fs.readFileSync( answer_file, {encoding:'utf8',flag:'r'} );
+    } catch(e) {
+        return null;
+    }
+}
+
 if ( base != 10 )
     p( BASE_PREFIX[base] + base_convert( ans, base ) );
 else
     p( ans );
+
+// save answer for next call
+write_ans(ans);
