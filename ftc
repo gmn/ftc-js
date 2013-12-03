@@ -10,11 +10,11 @@ var BASE_PREFIX = {2:'0b',8:'0',16:'0x'};
 
 var usage = function() {
     var exename = process.argv[1].lastIndexOf('/') != -1 ? process.argv[1].substring( process.argv[1].lastIndexOf('/') + 1 , process.argv[1].length ) : process.argv[1];
-    p( "usage: " + exename + " [-H|-B] <number|arithmetical statement>" );
+    p( "usage: " + exename + " [-H|-O|-B] <number|arithmetical statement>" );
     p( "      -H  prints result in Hexadecimal" );
     p( "      -B  prints result in Binary" );
     p( "      -O  prints result in Octal" );
-    p( "\n  If an operator (eg. + - / * %) is the first argument\n  the result from the previous operation will be inserted as the first operand:\n  Eg. ftc 2 * 5; ftc + 2; will yield 12 (2*5+2)" );
+    p( "\n  If an operator (+ - / * %) is the first argument\n   the result from the previous operation will be inserted as the first operand:\n   Eg. ftc 2 * 5; ftc + 2; will yield 12 ((2*5)+2)" );
     process.exit(0);
 }
 
@@ -82,9 +82,12 @@ var tokens = string.trim().split(/\s+/g);
 
 // check for conversion switch
 switch( tokens[0] ) {
-case "-H": base = 16; break;
-case "-O": base =  8; break;
-case "-B": base =  2; break;
+case "-H": case '-h':
+    base = 16; break;
+case "-O": case '-o':
+    base =  8; break;
+case "-B": case '-b':
+    base =  2; break;
 }
 if ( base !== 10 ) {
     tokens.shift();
@@ -106,7 +109,7 @@ var ans = '';
 try {
     eval( "ans = " + string );
 } catch(e) {
-    p( 'operation: "'+string+'" doesn\'t make sense' );
+    p( 'I\'m afraid I do not understand: "'+string+'"' );
     process.exit(0);
 }
 
