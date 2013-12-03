@@ -101,17 +101,18 @@ if ( is_operator(tokens[0]) ) {
         tokens.unshift( ans.trim() );
     }
 }
-// or look for 'ans' keyword; replace with last answer if found
-else if ( tokens.some(function(x){ return x === "ans" }) ) {
-    do {
-        var i = tokens.indexOf('ans');
-        if ( i === -1 )
-            break;
-        var ans = read_ans();
-        if ( ans ) {
+
+// look for 'ans' keyword; replace with last answer if found
+if ( tokens.some(function(x){ return x === "ans" }) ) {
+    var ans = read_ans();
+    if ( ans ) {
+        do {
+            var i = tokens.indexOf('ans');
+            if ( i === -1 )
+                break;
             tokens[i] = ans;
-        }
-    } while(1);
+        } while(1);
+    }
 }
 
 
