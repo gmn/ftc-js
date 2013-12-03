@@ -89,17 +89,31 @@ case "-O": case '-o':
 case "-B": case '-b':
     base =  2; break;
 }
+// and remove if found
 if ( base !== 10 ) {
     tokens.shift();
 }
 
 // begins with operator: get saved answer if there is one, and attach to front
 if ( is_operator(tokens[0]) ) {
-    var op = read_ans();
-    if ( op ) {
-        tokens.unshift( op.trim() );
+    var ans = read_ans();
+    if ( ans ) {
+        tokens.unshift( ans.trim() );
     }
 }
+// or look for 'ans' keyword; replace with last answer if found
+else if ( tokens.some(function(x){ return x === "ans" }) ) {
+    do {
+        var i = tokens.indexOf('ans');
+        if ( i === -1 )
+            break;
+        var ans = read_ans();
+        if ( ans ) {
+            tokens[i] = ans;
+        }
+    } while(1);
+}
+
 
 // reconstitute string
 string = tokens.join(' ');
