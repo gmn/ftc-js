@@ -10,11 +10,11 @@ var BASE_PREFIX = {2:'0b',8:'0',16:'0x'};
 
 var usage = function() {
     var exename = process.argv[1].lastIndexOf('/') != -1 ? process.argv[1].substring( process.argv[1].lastIndexOf('/') + 1 , process.argv[1].length ) : process.argv[1];
-    p( "usage: " + exename + " [-H|-O|-B] <number|arithmetical statement>" );
+    p( "usage: " + exename + " [-H|-O|-B] <arithmetical statement|number>" );
     p( "      -H  prints result in Hexadecimal" );
     p( "      -B  prints result in Binary" );
     p( "      -O  prints result in Octal" );
-    p( "\n  If an operator (+ - / * %) is the first argument\n   the result from the previous operation will be inserted as the first operand:\n   Eg. ftc 2 * 5; ftc + 2; will yield 12 ((2*5)+2)" );
+    p( "\n  If an operator (+ - / * %) is the first argument\n   the result from the previous operation will be inserted as the\n   first operand, eg. ftc 2 * 5; ftc + 2; will yield 12 ((2*5)+2)" );
     process.exit(0);
 }
 
