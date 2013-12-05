@@ -73,8 +73,11 @@ if ( process.argv.length <= 2 ) {
 
 // collect arguments
 process.argv.forEach(function(value,index) {
-    if ( index >= 2 )   // first 2 arguments are: "node path" & "script name"
+    if ( index >= 2 ) {       // first 2 args are: "node path" & "script name"
+        if ( value === 'x' )  // allow using 'x' in place of '*'
+            value = '*'; 
         string += ' ' + value;
+    }
 });
 
 // tokenize the string 
