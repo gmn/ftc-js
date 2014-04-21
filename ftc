@@ -71,13 +71,17 @@ if ( process.argv.length <= 2 ) {
     usage();
 }
 
+
 // collect arguments
-process.argv.forEach(function(value,index) {
+process.argv.forEach(function(value,index) 
+{
     if ( index >= 2 ) {       // first 2 args are: "node path" & "script name"
-        if ( value === 'x' )  // allow using 'x' in place of '*'
+        if ( value === 'x' ) {  // allow using 'x' in place of '*'
             value = '*'; 
-        else 
-            value = value.replace( /x/g, '*' );
+        } else {
+			if ( value.charAt(0) !== '0' )
+        		value = value.replace( /x/g, '*' );
+		}
 
         string += ' ' + value;
     }
