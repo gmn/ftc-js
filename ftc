@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+/* vim: set syntax=javascript: */
+
 
 var p = function(s) { console.log(s); };
 var answer_file = "/tmp/1234-ftc-tmp";
@@ -32,7 +34,7 @@ function is_operator( tok ) {
 
 // takes base-10 float, converts to int, and renders in
 //  string of a different base. Supported bases: 2, 8, 16
-function base_convert( num, base )
+function convert_to_base( num, base )
 {    
     num = Math.floor(num) + '';
     var div = num;
@@ -45,6 +47,47 @@ function base_convert( num, base )
     }
 
     return num.reverse().join('');
+}
+
+// takes a string; determines base from prefix, converts to Number and returns
+function convert_from_base( num ) 
+{
+  function binary( s ) {
+    var ar = s.split('').reverse();
+    var i = 0;
+    var base = 1;
+    var sum = 0;
+    while ( i < ar.length && ar[i] !== 'b' ) {
+      sum += base * ar[i++];
+      base *= 2;
+    }
+    return sum;
+  }
+  function octal(s) {
+    var ar = s.split('').reverse();
+    ar.pop();
+    var i = 0;
+    var base = 1;
+    var sum = 0;
+    while ( i < ar.length ) {
+      sum += base * ar[i++];
+      base *= 8;
+    }
+    return sum;
+  }
+  function hexadecimal(s) {
+    return parseFloat( s + 0, 10 );
+  }
+
+  if ( /^0b/.test(num) ) {
+    return binary(num);  
+  } else if ( /^0x/.test(num) ) {
+    return hexadecimal(num);
+  } else if ( /^0/.test(num) ) {
+    return octal(num);
+  } else {
+    return num + 0;
+  }
 }
 
 function write_ans( ans )
@@ -64,9 +107,11 @@ function read_ans()
     }
 }
 
-//
+/////////////////////////////////////////
+// 
 // begin execution
 // 
+/////////////////////////////////////////
 if ( process.argv.length <= 2 ) {
     usage();
 }
@@ -79,9 +124,9 @@ process.argv.forEach(function(value,index)
         if ( value === 'x' ) {  // allow using 'x' in place of '*'
             value = '*'; 
         } else {
-			if ( value.charAt(0) !== '0' )
-        		value = value.replace( /x/g, '*' );
-		}
+            if ( value.charAt(0) !== '0' )
+                value = value.replace( /x/g, '*' );
+        }
 
         string += ' ' + value;
     }
@@ -99,7 +144,7 @@ case "-O": case '-o':
 case "-B": case '-b':
     base =  2; break;
 }
-// and remove if found
+// remove conversion switch if found
 if ( base !== 10 ) {
     tokens.shift();
 }
@@ -125,6 +170,14 @@ if ( tokens.some(function(x){ return x === "ans" }) ) {
     }
 }
 
+// look for '0b' prefix indicating Binary number input 
+for ( var i = 0, l = tokens.length; i < l; i++ ) {
+    var tok = tokens[i];
+    if ( /^0b/.test( tok ) ) {
+      tokens[i] = convert_from_base(tok);
+    }
+}
+
 
 // reconstitute string
 string = tokens.join(' ');
@@ -139,7 +192,7 @@ try {
 }
 
 if ( base != 10 )
-    p( BASE_PREFIX[base] + base_convert( ans, base ) );
+    p( BASE_PREFIX[base] + convert_to_base( ans, base ) );
 else
     p( ans );
 
