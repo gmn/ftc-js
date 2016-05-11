@@ -22,7 +22,7 @@ var usage = function() {
 
 function is_operator( tok ) {
     switch ( tok ) {
-    case "-": 
+    case "-":
     case "+":
     case "*":
     case "/":
@@ -35,7 +35,7 @@ function is_operator( tok ) {
 // takes base-10 float, converts to int, and renders in
 //  string of a different base. Supported bases: 2, 8, 16
 function convert_to_base( num, base )
-{    
+{
     num = Math.floor(num) + '';
     var div = num;
     num = [];
@@ -50,7 +50,7 @@ function convert_to_base( num, base )
 }
 
 // takes a string; determines base from prefix, converts to Number and returns
-function convert_from_base( num ) 
+function convert_from_base( num )
 {
   function binary( s ) {
     var ar = s.split('').reverse();
@@ -80,7 +80,7 @@ function convert_from_base( num )
   }
 
   if ( /^0b/.test(num) ) {
-    return binary(num);  
+    return binary(num);
   } else if ( /^0x/.test(num) ) {
     return hexadecimal(num);
   } else if ( /^0/.test(num) ) {
@@ -108,9 +108,9 @@ function read_ans()
 }
 
 /////////////////////////////////////////
-// 
+//
 // begin execution
-// 
+//
 /////////////////////////////////////////
 if ( process.argv.length <= 2 ) {
     usage();
@@ -118,11 +118,11 @@ if ( process.argv.length <= 2 ) {
 
 
 // collect arguments
-process.argv.forEach(function(value,index) 
+process.argv.forEach(function(value,index)
 {
     if ( index >= 2 ) {       // first 2 args are: "node path" & "script name"
         if ( value === 'x' ) {  // allow using 'x' in place of '*'
-            value = '*'; 
+            value = '*';
         } else {
             if ( value.charAt(0) !== '0' )
                 value = value.replace( /x/g, '*' );
@@ -132,7 +132,7 @@ process.argv.forEach(function(value,index)
     }
 });
 
-// tokenize the string 
+// tokenize the string
 var tokens = string.trim().split(/\s+/g);
 
 // check for conversion switch
@@ -170,7 +170,7 @@ if ( tokens.some(function(x){ return x === "ans" }) ) {
     }
 }
 
-// look for '0b' prefix indicating Binary number input 
+// look for '0b' prefix indicating Binary number input
 for ( var i = 0, l = tokens.length; i < l; i++ ) {
     var tok = tokens[i];
     if ( /^0b/.test( tok ) ) {
